@@ -79,6 +79,10 @@
       text-decoration: none;
       margin-top: 15px;
       box-shadow: 0 4px 15px rgba(196,241,53,0.3);
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      font-size: 0.9rem;
       transition: transform 0.2s;
     }
     .dl-btn:active { transform: scale(0.95); }
@@ -228,9 +232,9 @@
     <div class="badge">Insert Coin</div>
     <h1>KOLA</h1>
     <p class="tagline">A tiny arcade for taking a break. Pick a cabinet, hit play — <strong style="color:var(--coral)">no download, no login.</strong></p>
-    <a href="index.html" download="KOLA_Offline_Game.html" class="dl-btn">
+    <button onclick="downloadSelf()" class="dl-btn">
       📥 Download Offline Game
-    </a>
+    </button>
   </header>
 
   <div class="nav-tabs">
@@ -271,6 +275,20 @@
   </div>
 
   <script>
+    /* AUTOMATIC FILE DOWNLOADER */
+    function downloadSelf() {
+      const pageHTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([pageHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'KOLA_Offline_Game.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     function switchGame(type){
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
@@ -393,4 +411,4 @@
     initTap();
   </script>
 </body>
-      </html>
+  </html>
