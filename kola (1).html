@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOLA — Arcade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1F1230;
+    --ink-2:#2A1A42;
+    --cream:#F5EFE6;
+    --lime:#C4F135;
+    --coral:#FF6B5B;
+    --teal:#0E5C56;
+    --teal-bright:#1B8C82;
+    --line: rgba(245,239,230,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, #33204F 0%, transparent 55%),
+      radial-gradient(circle at 85% 10%, #143A38 0%, transparent 50%),
+      var(--ink);
+    color:var(--cream);
+    font-family:'Baloo 2', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .mono{font-family:'Space Mono', monospace;}
+
+  /* ---------- Header / Hero ---------- */
+  header{
+    padding: 56px 24px 24px;
+    text-align:center;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'Space Mono', monospace;
+    letter-spacing:0.35em;
+    font-size:11px;
+    color:var(--lime);
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
+  .eyebrow::before, .eyebrow::after{
+    content:"";
+    width:28px; height:1px;
+    background:var(--line);
+  }
+  .wordmark{
+    font-weight:800;
+    font-size:clamp(64px, 14vw, 140px);
+    line-height:0.9;
+    margin:10px 0 6px;
+    letter-spacing:2px;
+    background: linear-gradient(180deg, var(--cream) 0%, var(--cream) 55%, var(--lime) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow: 0 10px 0 rgba(0,0,0,0.15);
+    position:relative;
+    display:inline-block;
+  }
+  .tagline{
+    color: rgba(245,239,230,0.72);
+    font-size:16px;
+    max-width:440px;
+    margin: 0 auto;
+    line-height:1.55;
+  }
+  .tagline b{ color:var(--coral); font-weight:700;}
+
+  .coin-row{
+    margin-top:22px;
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    color: rgba(245,239,230,0.55);
+  }
+  .coin{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--lime);
+    box-shadow:0 0 8px var(--lime);
+    animation: blink 1.6s infinite ease-in-out;
+  }
+  .coin:nth-child(2){animation-delay:.25s;}
+  .coin:nth-child(3){animation-delay:.5s;}
+  @keyframes blink{ 0%,100%{opacity:.25;} 50%{opacity:1;} }
+
+  /* ---------- Game selector ---------- */
+  .picker{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin: 34px 0 8px;
+    padding: 0 20px;
+  }
+  .pick-btn{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    background:var(--ink-2);
+    color: var(--cream);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:10px 20px;
+    cursor:pointer;
+    transition: all .18s ease;
+  }
+  .pick-btn:hover{ border-color:var(--lime); color:var(--lime); }
+  .pick-btn.active{
+    background:var(--lime);
+    color:var(--ink);
+    border-color:var(--lime);
+    font-weight:700;
+  }
+
+  /* ---------- Cabinet ---------- */
+  .cabinet-wrap{
+    display:flex;
+    justify-content:center;
+    padding: 26px 16px 80px;
+  }
+  .cabinet{
+    width:100%;
+    max-width:560px;
+    background: linear-gradient(180deg, #3A2557 0%, #241436 100%);
+    border-radius: 28px;
+    padding: 20px;
+    border: 1px solid rgba(245,239,230,0.08);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.45);
+    position:relative;
+  }
+  .marquee{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 4px 8px 16px;
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    color: rgba(245,239,230,0.6);
+  }
+  .marquee .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--coral);
+    display:inline-block;
+    margin-right:6px;
+    box-shadow:0 0 8px var(--coral);
+  }
+  .screen{
+    background: #0F0A1C;
+    border-radius: 16px;
+    border: 6px solid #17102A;
+    padding: 26px 20px;
+    min-height: 420px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+  }
+  .screen::before{
+    content:"";
+    position:absolute; inset:0;
+    background: repeating-linear-gradient( to bottom, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+    border-radius:10px;
+    pointer-events:none;
+  }
+  .game-title{
+    font-weight:700;
+    font-size:22px;
+    color:var(--lime);
+    margin-bottom:4px;
+  }
+  .status-line{
+    font-family:'Space Mono', monospace;
+    font-size:13px;
+    color: rgba(245,239,230,0.65);
+    margin-bottom:20px;
+    min-height:18px;
+    text-align:center;
+  }
+
+  /* ---------- Tic Tac Toe ---------- */
+  .ttt-board{
+    display:grid;
+    grid-template-columns: repeat(3, 84px);
+    grid-template-rows: repeat(3, 84px);
+    gap:8px;
+  }
+  .ttt-cell{
+    background: var(--ink-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Space Mono', monospace;
+    font-size:34px;
+    font-weight:700;
+    cursor:pointer;
+    transition: background .15s ease;
+  }
+  .ttt-cell:hover{ background:#3A2557; }
+  .ttt-cell.x{ color:var(--coral); }
+  .ttt-cell.o{ color:var(--teal-bright); }
+
+  /* ---------- Memory game ---------- */
+  .mem-board{
+    display:grid;
+    grid-template-columns: repeat(4, 68px);
+    gap:8px;
+  }
+  .mem-card{
+    width:68px; height:68px;
+    border-radius:10px;
+    background: var(--ink-2);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    cursor:pointer;
+    user-select:none;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .mem-card.flipped, .mem-card.matched{
+    background: #3A2557;
+  }
+  .mem-card.matched{
+    color:var(--lime);
+    border-color: var(--lime);
+  }
+  .mem-card .face{ display:none; }
+  .mem-card.flipped .face, .mem-card.matched .face{ display:block; }
+
+  /* ---------- Tap War (2 player, one device) ---------- */
+  .tap-wrap{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    height:330px;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .tap-zone{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background .08s ease;
+    gap:4px;
+  }
+  .tap-zone.p2{
+    transform:rotate(180deg);
+    background: rgba(255,107,91,0.18);
+  }
+  .tap-zone.p1{
+    background: rgba(27,140,130,0.22);
+  }
+  .tap-zone:active{ filter:brightness(1.25); }
+  .tap-label{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color: rgba(245,239,230,0.65);
+  }
+  .tap-score{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size:34px;
+  }
+  .tap-hint{
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    color: rgba(245,239,230,0.4);
+  }
+  .tap-mid{
+    background:#0F0A1C;
+    padding:10px 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .rope-track{
+    width:70%;
+    max-width:220px;
+    height:6px;
+    background:var(--ink-2);
+    border-radius:3px;
+    position:relative;
+  }
+  .rope-marker{
+    position:absolute;
+    top:50%;
+    width:16px; height:16px;
+    border-radius:50%;
+    background:var(--lime);
+    left:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 8px var(--lime);
+    transition: left .08s linear;
+  }
+
+  .action-row{
+    margin-top:22px;
+    display:flex;
+    gap:10px;
+  }
+  .btn{
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    background:transparent;
+    color:var(--cream);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition: all .15s ease;
+  }
+  .btn:hover{ border-color:var(--coral); color:var(--coral); }
+  .btn.primary{
+    background:var(--coral);
+    color:var(--ink);
+    border-color:var(--coral);
+    font-weight:700;
+  }
+  .btn.primary:hover{ opacity:0.88; color:var(--ink); }
+
+  footer{
+    text-align:center;
+    padding: 0 20px 50px;
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    color: rgba(245,239,230,0.35);
+    text-transform:uppercase;
+  }
+
+  @media (max-width:400px){
+    .ttt-board{ grid-template-columns: repeat(3, 72px); grid-template-rows: repeat(3, 72px); }
+    .mem-board{ grid-template-columns: repeat(4, 58px); }
+    .mem-card{ width:58px; height:58px; font-size:22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .coin{ animation:none; }
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Insert Coin</div>
+  <div class="wordmark">KOLA</div>
+  <p class="tagline">A tiny arcade for taking a break. Pick a cabinet, hit play — <b>no download, no login.</b></p>
+  <div class="coin-row"><span class="coin"></span><span class="coin"></span><span class="coin"></span></div>
+</header>
+
+<div class="picker">
+  <button class="pick-btn active" data-game="ttt">Tic&nbsp;Tac&nbsp;Toe</button>
+  <button class="pick-btn" data-game="mem">Memory&nbsp;Match</button>
+  <button class="pick-btn" data-game="tap">Tap&nbsp;War&nbsp;·&nbsp;2P</button>
+</div>
+
+<div class="cabinet-wrap">
+  <div class="cabinet">
+    <div class="marquee">
+      <span><span class="dot"></span>ON AIR</span>
+      <span class="mono" id="cab-label">CAB-01 · TTT</span>
+    </div>
+    <div class="screen">
+
+      <!-- Tic Tac Toe -->
+      <div id="ttt-view">
+        <div class="game-title">Tic Tac Toe</div>
+        <div class="status-line" id="ttt-status">Your turn — you're X</div>
+        <div class="ttt-board" id="ttt-board"></div>
+        <div class="action-row">
+          <button class="btn primary" id="ttt-reset">New Round</button>
+        </div>
+      </div>
+
+      <!-- Memory Match -->
+      <div id="mem-view" style="display:none;">
+        <div class="game-title">Memory Match</div>
+        <div class="status-line" id="mem-status">Moves: 0 · Matches: 0 / 8</div>
+        <div class="mem-board" id="mem-board"></div>
+        <div class="action-row">
+          <button class="btn primary" id="mem-reset">Shuffle & Restart</button>
+        </div>
+      </div>
+
+      <!-- Tap War (2 players, one device) -->
+      <div id="tap-view" style="display:none; width:100%;">
+        <div class="tap-wrap">
+          <div class="tap-zone p2" id="tap-p2">
+            <div class="tap-label">Player 2</div>
+            <div class="tap-score" id="tap-score2">0</div>
+            <div class="tap-hint">tap here</div>
+          </div>
+          <div class="tap-mid">
+            <div class="rope-track"><div class="rope-marker" id="rope-marker"></div></div>
+            <div class="status-line" id="tap-status" style="margin:0;">Tap fastest to win the tug-of-war!</div>
+          </div>
+          <div class="tap-zone p1" id="tap-p1">
+            <div class="tap-label">Player 1</div>
+            <div class="tap-score" id="tap-score1">0</div>
+            <div class="tap-hint">tap here</div>
+          </div>
+        </div>
+        <div class="action-row" style="justify-content:center;">
+          <button class="btn primary" id="tap-reset">Restart</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>Made for Kola Arcade · Have fun</footer>
+
+<script>
+  // ---------- Navigation between cabinets ----------
+  const pickBtns = document.querySelectorAll('.pick-btn');
+  const views = {
+    ttt: document.getElementById('ttt-view'),
+    mem: document.getElementById('mem-view'),
+    tap: document.getElementById('tap-view'),
+  };
+  const labels = { ttt: 'CAB-01 · TTT', mem: 'CAB-02 · MEM', tap: 'CAB-03 · 2P' };
+  const cabLabel = document.getElementById('cab-label');
+
+  pickBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      pickBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const game = btn.dataset.game;
+      Object.keys(views).forEach(key => {
+        views[key].style.display = (key === game) ? '' : 'none';
+      });
+      cabLabel.textContent = labels[game];
+      if(game === 'tap') tapInit();
+    });
+  });
+
+  // ---------- Tic Tac Toe (vs simple AI) ----------
+  const tttBoardEl = document.getElementById('ttt-board');
+  const tttStatus = document.getElementById('ttt-status');
+  let tttBoard, tttOver;
+
+  const WIN_LINES = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  function tttInit(){
+    tttBoard = Array(9).fill(null);
+    tttOver = false;
+    tttStatus.textContent = "Your turn — you're X";
+    renderTtt();
+  }
+
+  function renderTtt(){
+    tttBoardEl.innerHTML = '';
+    tttBoard.forEach((val, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'ttt-cell' + (val === 'X' ? ' x' : val === 'O' ? ' o' : '');
+      cell.textContent = val || '';
+      cell.addEventListener('click', () => tttPlay(i));
+      tttBoardEl.appendChild(cell);
+    });
+  }
+
+  function checkWinner(board){
+    for(const [a,b,c] of WIN_LINES){
+      if(board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+    }
+    if(board.every(v => v)) return 'draw';
+    return null;
+  }
+
+  function tttPlay(i){
+    if(tttOver || tttBoard[i]) return;
+    tttBoard[i] = 'X';
+    renderTtt();
+    let result = checkWinner(tttBoard);
+    if(result){ tttEnd(result); return; }
+
+    tttStatus.textContent = "Kola is thinking…";
+    setTimeout(() => {
+      const move = bestAiMove(tttBoard);
+      if(move !== -1) tttBoard[move] = 'O';
+      renderTtt();
+      result = checkWinner(tttBoard);
+      if(result){ tttEnd(result); return; }
+      tttStatus.textContent = "Your turn — you're X";
+    }, 350);
+  }
+
+  function bestAiMove(board){
+    // try to win
+    for(const [a,b,c] of WIN_LINES){
+      const line = [board[a], board[b], board[c]];
+      if(line.filter(v=>v==='O').length===2 && line.includes(null)){
+        return [a,b,c][line.indexOf(null)];
+      }
+    }
+    // block player
+    for(const [a,b,c] of WIN_LINES){
+      const line = [board[a], board[b], board[c]];
+      if(line.filter(v=>v==='X').length===2 && line.includes(null)){
+        return [a,b,c][line.indexOf(null)];
+      }
+    }
+    // take center
+    if(!board[4]) return 4;
+    // take a corner
+    const corners = [0,2,6,8].filter(i => !board[i]);
+    if(corners.length) return corners[Math.floor(Math.random()*corners.length)];
+    // any free
+    const free = board.map((v,i)=>v?null:i).filter(v=>v!==null);
+    return free.length ? free[Math.floor(Math.random()*free.length)] : -1;
+  }
+
+  function tttEnd(result){
+    tttOver = true;
+    if(result === 'draw') tttStatus.textContent = "It's a draw — new round?";
+    else if(result === 'X') tttStatus.textContent = "You win! 🎉";
+    else tttStatus.textContent = "Kola wins this round.";
+  }
+
+  document.getElementById('ttt-reset').addEventListener('click', tttInit);
+  tttInit();
+
+  // ---------- Memory Match ----------
+  const memBoardEl = document.getElementById('mem-board');
+  const memStatus = document.getElementById('mem-status');
+  const ICONS = ['🍋','🍄','🍉','⭐','🎧','🎲','🌵','🪁'];
+  let memCards, memFlipped, memMatchedCount, memMoves, memLock;
+
+  function memInit(){
+    const pairs = [...ICONS, ...ICONS];
+    for(let i = pairs.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+    }
+    memCards = pairs.map((icon, idx) => ({ icon, idx, flipped:false, matched:false }));
+    memFlipped = [];
+    memMatchedCount = 0;
+    memMoves = 0;
+    memLock = false;
+    memStatus.textContent = `Moves: 0 · Matches: 0 / ${ICONS.length}`;
+    renderMem();
+  }
+
+  function renderMem(){
+    memBoardEl.innerHTML = '';
+    memCards.forEach(card => {
+      const el = document.createElement('div');
+      el.className = 'mem-card' + (card.flipped ? ' flipped' : '') + (card.matched ? ' matched' : '');
+      el.innerHTML = `<span class="face">${card.icon}</span>`;
+      el.addEventListener('click', () => memFlip(card.idx));
+      memBoardEl.appendChild(el);
+    });
+  }
+
+  function memFlip(idx){
+    const card = memCards[idx];
+    if(memLock || card.flipped || card.matched) return;
+    card.flipped = true;
+    memFlipped.push(card);
+    renderMem();
+
+    if(memFlipped.length === 2){
+      memMoves++;
+      memLock = true;
+      const [a, b] = memFlipped;
+      if(a.icon === b.icon){
+        a.matched = true; b.matched = true;
+        memMatchedCount++;
+        memFlipped = [];
+        memLock = false;
+        updateMemStatus();
+        renderMem();
+        if(memMatchedCount === ICONS.length){
+          memStatus.textContent = `Cleared in ${memMoves} moves! 🎉`;
+        }
+      } else {
+        setTimeout(() => {
+          a.flipped = false; b.flipped = false;
+          memFlipped = [];
+          memLock = false;
+          renderMem();
+          updateMemStatus();
+        }, 650);
+      }
+    }
+  }
+
+  function updateMemStatus(){
+    memStatus.textContent = `Moves: ${memMoves} · Matches: ${memMatchedCount} / ${ICONS.length}`;
+  }
+
+  document.getElementById('mem-reset').addEventListener('click', memInit);
+  memInit();
+</script>
+
+</body>
+</html>
