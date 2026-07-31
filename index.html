@@ -76,6 +76,28 @@
   }
   .tagline b{ color:var(--coral); font-weight:700;}
 
+  /* ---------- Download Button Box ---------- */
+  .download-box {
+    margin-top: 18px;
+  }
+  .download-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--lime);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(196, 241, 53, 0.4);
+    transition: all 0.2s ease;
+  }
+  .download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(196, 241, 53, 0.7);
+  }
+
   .coin-row{
     margin-top:22px;
     display:flex;
@@ -377,6 +399,12 @@
   <div class="eyebrow">Insert Coin</div>
   <div class="wordmark">KOLA</div>
   <p class="tagline">A tiny arcade for taking a break. Pick a cabinet, hit play — <b>no download, no login.</b></p>
+  
+  <!-- Download Button Added Here -->
+  <div class="download-box">
+    <button class="download-btn" onclick="downloadGame()">📥 Download Offline Game</button>
+  </div>
+
   <div class="coin-row"><span class="coin"></span><span class="coin"></span><span class="coin"></span></div>
 </header>
 
@@ -444,6 +472,18 @@
 <footer>Made for Kola Arcade · Have fun</footer>
 
 <script>
+  // ---------- Auto Download Function ----------
+  function downloadGame() {
+    const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Kola-Arcade-Game.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   // ---------- Navigation between cabinets ----------
   const pickBtns = document.querySelectorAll('.pick-btn');
   const views = {
@@ -523,26 +563,21 @@
   }
 
   function bestAiMove(board){
-    // try to win
     for(const [a,b,c] of WIN_LINES){
       const line = [board[a], board[b], board[c]];
       if(line.filter(v=>v==='O').length===2 && line.includes(null)){
         return [a,b,c][line.indexOf(null)];
       }
     }
-    // block player
     for(const [a,b,c] of WIN_LINES){
       const line = [board[a], board[b], board[c]];
       if(line.filter(v=>v==='X').length===2 && line.includes(null)){
         return [a,b,c][line.indexOf(null)];
       }
     }
-    // take center
     if(!board[4]) return 4;
-    // take a corner
     const corners = [0,2,6,8].filter(i => !board[i]);
     if(corners.length) return corners[Math.floor(Math.random()*corners.length)];
-    // any free
     const free = board.map((v,i)=>v?null:i).filter(v=>v!==null);
     return free.length ? free[Math.floor(Math.random()*free.length)] : -1;
   }
@@ -631,4 +666,4 @@
 </script>
 
 </body>
-</html>
+                                      </html>   
